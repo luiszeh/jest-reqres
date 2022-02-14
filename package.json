@@ -4,13 +4,27 @@
   "description": "Testando o site ReqRes",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --watchAll"
+  },
+  "jest": {
+    "coverageReporters": [
+      "lcov"
+    ],
+    "coverageDirectory": "./reports/code-coverage",
+    "reporters": [
+      "default",
+      "./node_modules/jest-html-reporter"
+    ]
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "jest": "^27.5.1",
+    "jest-html-reporter": "^3.4.2",
     "supertest": "^6.2.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.0"
   }
 }

@@ -1,7 +1,8 @@
 const request = require('supertest');
-const API_URL = "https://reqres.in"
+require('dotenv').config();
+const API_URL = process.env.BASE_URL;
 
-describe('Testando requisições com o método GET', () => {
+describe('Testando endpoints da API ReqRes', () => {
 
   it('Valida o status 200 e a quantidade de usuários retornados', async () => {
     await request(API_URL)
@@ -37,6 +38,7 @@ describe('Testando requisições com o método GET', () => {
           "text": "To keep ReqRes free, contributions towards server costs are appreciated!"
       }
     }
+
     await request(API_URL)
       .get('/api/users/2')
       .set('Accept', 'application/json/')
@@ -56,20 +58,63 @@ describe('Testando requisições com o método GET', () => {
       })
   })
 
-  it.skip('Valida o status 201, se o campo createdAt existe e as chaves/valores name, job, id', async () => {
+  it('Valida o status 201, se o campo createdAt existe e as chaves/valores name, job, id', async () => {
     const data = {
       name: "morpheus",
       job: "leader",
       id: "127",
-      createdAt: "2022-02-11T20:46:47.756Z"
+      createdAt: "2022-02-14T16:18:52.640Z"
     }
     await request(API_URL)
       .post('/api/users')
       .set('Accept', 'application/json/')
+      .send({
+        "name": "morpheus",
+        "job": "leader"
+      })
       .expect(201)
       .then(response => {
-        expect(response.body).toContain(data.createdAt)
-        // expect(response.body).toEqual(data)
+        expect(response.body.name).toEqual(data.name)
+        expect(response.body.job).toEqual(data.job)
+        expect(response.body).toHaveProperty("id")
+        expect(response.body).toHaveProperty("createdAt")
+      })
+  })
+
+  it('Valida que foi retornado o status 204', async () => {
+    await request(API_URL)
+      .delete('/api/users/2')
+      .set('Accept', 'application/json/')
+      .expect(204)
+  })
+
+  it('Valida o status 200, e verifica se foi feito o login e retorna o token de auth', async () => {
+    const data = {
+      "token": "QpwL5tke4Pnpja7X4"
+    }
+
+    await request(API_URL)
+      .post('/api/login')
+      .set('Accept', 'application/json/')
+      .send({
+        "email": "eve.holt@reqres.in",
+        "password": "cityslicka"
+      })
+      .expect(200)
+      .then(response => {
+        expect(response.body).toEqual(data)
+        console.log(data)
+      })
+  })
+
+  it('Valida o status 200, quantidade de usuários retornados e se existe um id:3', async () => {
+    await request(API_URL)
+      .get('/api/users?delay=3')
+      .set('Accept', 'application/json/')
+      .expect(200)
+      .then(response => {
+        expect(response.body.total).toEqual(12)
+        expect(response.body.data[2].id).toEqual(3)
       })
   })
 
